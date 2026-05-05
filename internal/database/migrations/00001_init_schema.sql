@@ -61,8 +61,7 @@ CREATE TABLE audit_events (
     event_hash      bytea NOT NULL,
     created_at      timestamptz NOT NULL DEFAULT now()
 );
-CREATE INDEX audit_events_org_created_idx ON audit_events(organization_id, created_at);
-CREATE INDEX audit_events_chain_idx ON audit_events(organization_id, created_at DESC);
+CREATE INDEX audit_events_chain_idx ON audit_events(organization_id, created_at DESC, id DESC);
 
 -- canonical_event_payload returns the bytes that get hashed for a given row.
 -- Stable across re-imports: same logical event -> same bytes -> same hash.
@@ -96,7 +95,8 @@ BEGIN
     FROM audit_events
     WHERE organization_id IS NOT DISTINCT FROM NEW.organization_id
     ORDER BY created_at DESC, id DESC
-    LIMIT 1;
+    LIMIT 1
+    FOR UPDATE;
 
     NEW.prev_hash := v_prev;
     NEW.event_hash := digest(
