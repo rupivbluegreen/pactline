@@ -40,7 +40,7 @@ test:
 	go test ./...
 	cd apps/ai-sidecar && uv run pytest
 	cd apps/document-sidecar && uv run pytest
-	cd apps/web && pnpm test --run
+	cd apps/web && pnpm test
 
 format:
 	gofmt -w .
