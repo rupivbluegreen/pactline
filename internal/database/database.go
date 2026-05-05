@@ -4,6 +4,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"os"
 	"time"
 
@@ -37,9 +38,9 @@ func Connect(ctx context.Context, dsn string) (*Pool, error) {
 func DSNFromEnv() string {
 	host := envOr("PGHOST", "localhost")
 	port := envOr("PGPORT", "5433")
-	user := envOr("PGUSER", "pactline")
-	pass := envOr("PGPASSWORD", "pactline")
-	db := envOr("PGDATABASE", "pactline")
+	user := url.QueryEscape(envOr("PGUSER", "pactline"))
+	pass := url.QueryEscape(envOr("PGPASSWORD", "pactline"))
+	db := url.PathEscape(envOr("PGDATABASE", "pactline"))
 	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, pass, host, port, db)
 }
 

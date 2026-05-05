@@ -2,6 +2,9 @@ package database_test
 
 import (
 	"context"
+	"errors"
+	"net"
+	"strings"
 	"testing"
 	"time"
 
@@ -14,6 +17,9 @@ func TestConnect(t *testing.T) {
 
 	pool, err := database.Connect(ctx, database.DSNFromEnv())
 	if err != nil {
+		if isPostgresUnavailable(err) {
+			t.Skipf("postgres unavailable, skipping integration test: %v", err)
+		}
 		t.Fatalf("connect: %v", err)
 	}
 	defer pool.Close()
@@ -21,4 +27,15 @@ func TestConnect(t *testing.T) {
 	if err := pool.Ping(ctx); err != nil {
 		t.Errorf("ping after connect: %v", err)
 	}
+}
+
+func isPostgresUnavailable(err error) bool {
+	var netErr *net.OpError
+	if errors.As(err, &netErr) {
+		return true
+	}
+	msg := err.Error()
+	return strings.Contains(msg, "connect: connection refused") ||
+		strings.Contains(msg, "no such host") ||
+		strings.Contains(msg, "i/o timeout")
 }
