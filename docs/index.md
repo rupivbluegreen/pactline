@@ -16,15 +16,21 @@ title: Home
 The repository scaffold runs end-to-end with no features.
 Polyglot stack: Go core (`cmd/api`, `cmd/worker`, `internal/*`),
 Python sidecars (`apps/{ai,document}-sidecar`), Next.js 15 frontend
-(`apps/web`). Hello-world API → OpenAPI → TypeScript types pipeline
-is live. CI runs lint, typecheck, test, and a generated-types drift
-check on every push.
+(`apps/web`).
 
 **Phase 1 — v1 MVP** in progress
 
-Pre-sign pipeline (intake → approval → signature) for one contract
-type per organization, with read-only AI extraction. Story 1 (signup
-→ organization → empty contracts list) is currently being implemented.
+| Story | Status | Tag |
+|---|---|---|
+| Story 1 — signup → organization → empty contracts list | ✓ shipped 2026-05-05 | `phase-1-story-1` |
+| Story 2 — contract intake → AI metadata extraction | planned | — |
+| Story 3 — playbook flags + approval routing | planned | — |
+| Story 4 — DocuSign integration + executed-document storage | planned | — |
+| Story 5 — repository view with metadata search | planned | — |
+
+Story 1 in detail: a new user signs in via magic link, creates an organization, and lands on an empty contracts list. Exercises the full multi-tenant chassis (auth, sessions, hash-chained audit, tenant-scoped queries) end-to-end.
+
+The audit log is hash-chained — every state-changing action writes one immutable event whose hash binds to the prior event in the same chain (per organization, with a separate system chain for pre-org events). The chain is verifiable in SQL (`prev_hash` of row N matches `event_hash` of row N-1). Lifted from the substrate-pattern of the sister product [statebound](https://github.com/rupivbluegreen/statebound).
 
 [See the full phased plan →](roadmap.html)
 
@@ -43,10 +49,10 @@ type per organization, with read-only AI extraction. Story 1 (signup
 
 Pactline's pitch is **workflow-native CLM**: contracts as state
 machines. Every state change runs in a versioned, durable workflow
-(Temporal). There are no "save and hope" code paths. The target
-audience is legal-ops at tech-mature mid-market companies (200–2000
-people, eng-led culture) who already own a CLM tool and have
-outgrown its workflow primitives.
+(Temporal, lighting up in Story 2+). There are no "save and hope"
+code paths. The target audience is legal-ops at tech-mature mid-
+market companies (200–2000 people, eng-led culture) who already own
+a CLM tool and have outgrown its workflow primitives.
 
 ## Source and license
 
