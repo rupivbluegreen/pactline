@@ -1,0 +1,14 @@
+title: Pactline
+description: Open-source contract lifecycle platform built on durable workflows.
+theme: jekyll-theme-cayman
+markdown: kramdown
+permalink: pretty
+
+# Display nav header
+github:
+  repository_url: https://github.com/rupivbluegreen/pactline
+
+# Exclude internal-only docs from the published site
+exclude:
+  - superpowers/
+  - _config.yml
