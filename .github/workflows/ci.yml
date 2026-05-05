@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Go mod download
+        run: go mod download
+
+      - name: AI sidecar deps
+        run: cd apps/ai-sidecar && uv sync
+
+      - name: Document sidecar deps
+        run: cd apps/document-sidecar && uv sync
+
+      - name: Web deps
+        run: pnpm install --dir apps/web
+
+      - name: Lint
+        run: make lint
+
+      - name: Typecheck
+        run: make typecheck
+
+      - name: Verify generated types are not stale
+        run: |
+          make generate-types
+          if ! git diff --exit-code apps/web/src/api/types.ts; then
+            echo "::error::Generated types are stale. Run 'make generate-types' locally."
+            exit 1
+          fi
+
+      - name: Test
+        run: make test

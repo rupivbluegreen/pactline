@@ -1,0 +1,60 @@
+openapi: 3.1.0
+info:
+  title: Pactline API
+  version: 0.0.1
+  description: |
+    Contract lifecycle platform built on durable workflows.
+    This spec is the single source of truth for the Go API surface
+    and the TypeScript frontend client. CI fails if generated types
+    drift from this file.
+servers:
+  - url: http://localhost:8000
+    description: Local development
+paths:
+  /healthz:
+    get:
+      operationId: healthz
+      summary: Liveness probe
+      tags: [health]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /hello:
+    get:
+      operationId: hello
+      summary: Hello-world demonstrating the API → frontend type pipeline
+      tags: [meta]
+      parameters:
+        - in: query
+          name: name
+          required: false
+          schema:
+            type: string
+            default: world
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HelloResponse'
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          example: ok
+    HelloResponse:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+          example: hello, world

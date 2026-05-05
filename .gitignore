@@ -1,0 +1,62 @@
+# Local tooling state
+.remember/
+.claude/
+CLAUDE.md
+.DS_Store
+
+# Go
+bin/
+vendor/
+*.test
+*.out
+coverage.out
+go.work
+go.work.sum
+
+# Generated proto stubs (regenerate with `make generate-proto`)
+internal/ai/aigrpc/
+internal/document/documentgrpc/
+apps/ai-sidecar/src/ai_sidecar/proto/
+apps/document-sidecar/src/document_sidecar/proto/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.pyright/
+.mypy_cache/
+.coverage
+htmlcov/
+dist/
+build/
+
+# uv
+.uv/
+
+# Node / Next.js
+node_modules/
+.next/
+.turbo/
+*.tsbuildinfo
+.pnpm-store/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local infra data
+infra/data/
+infra/.volumes/
+
+# Logs
+*.log
