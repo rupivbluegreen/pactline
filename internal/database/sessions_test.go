@@ -109,4 +109,3 @@ func TestMagicLinkRepo_InvalidToken(t *testing.T) {
 		t.Errorf("expected ErrInvalidToken, got %v", err)
 	}
 }
-
