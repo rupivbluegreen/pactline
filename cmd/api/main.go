@@ -10,12 +10,16 @@ import (
 	"syscall"
 	"time"
 
+	"go.temporal.io/sdk/client"
+
 	"github.com/rupivbluegreen/pactline/internal/api"
 	"github.com/rupivbluegreen/pactline/internal/api/handlers"
 	"github.com/rupivbluegreen/pactline/internal/auth"
 	"github.com/rupivbluegreen/pactline/internal/database"
 	"github.com/rupivbluegreen/pactline/internal/email"
 	"github.com/rupivbluegreen/pactline/internal/organizations"
+	"github.com/rupivbluegreen/pactline/internal/storage"
+	pactlineworkflow "github.com/rupivbluegreen/pactline/internal/workflow"
 )
 
 func main() {
@@ -23,6 +27,8 @@ func main() {
 
 	addr := envOr("PACTLINE_API_ADDR", ":8000")
 	baseURL := envOr("PACTLINE_BASE_URL", "http://localhost:3000")
+	tqueue := envOr("PACTLINE_TASK_QUEUE", pactlineworkflow.WorkflowTaskQueue)
+	tHost := envOr("TEMPORAL_HOST", "localhost:7233")
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -38,6 +44,19 @@ func main() {
 		slog.Error("migrate up", "err", err)
 		os.Exit(1)
 	}
+
+	st, err := storage.New(ctx, storage.ConfigFromEnv())
+	if err != nil {
+		slog.Error("storage init", "err", err)
+		os.Exit(1)
+	}
+
+	tcli, err := client.Dial(client.Options{HostPort: tHost})
+	if err != nil {
+		slog.Error("temporal dial", "err", err)
+		os.Exit(1)
+	}
+	defer tcli.Close()
 
 	users := database.NewUserRepo(pool)
 	orgs := database.NewOrganizationRepo(pool)
@@ -55,7 +74,16 @@ func main() {
 		Auth:        &handlers.AuthHandlers{Svc: authSvc},
 		Me:          &handlers.MeHandler{Users: users, Memberships: mems, Orgs: orgs},
 		Orgs:        &handlers.OrgsHandlers{Svc: orgSvc},
-		Contracts:   &handlers.ContractsHandler{},
+		Contracts: &handlers.ContractsHandler{
+			Pool:              pool,
+			Storage:           st,
+			Contracts:         database.NewContractRepo(pool),
+			ContractTypes:     database.NewContractTypeRepo(pool),
+			ContractDocuments: database.NewContractDocumentRepo(pool),
+			ExtractedFields:   database.NewExtractedFieldRepo(pool),
+			Temporal:          tcli,
+			TaskQueue:         tqueue,
+		},
 	}
 
 	srv := &http.Server{

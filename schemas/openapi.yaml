@@ -134,6 +134,70 @@ paths:
               schema: { $ref: '#/components/schemas/ContractsResponse' }
         '400': { description: No organization context }
         '401': { description: Unauthenticated }
+    post:
+      operationId: createContract
+      tags: [contracts]
+      summary: Upload a contract document and start the lifecycle workflow
+      security: [{ session: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [title, file]
+              properties:
+                title: { type: string }
+                file:  { type: string, format: binary }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CreateContractResponse' }
+        '400': { description: Bad request }
+        '401': { description: Unauthenticated }
+        '413': { description: File too large }
+        '415': { description: Unsupported file type }
+        '502': { description: Workflow start failed }
+  /contracts/{id}:
+    get:
+      operationId: getContract
+      tags: [contracts]
+      summary: Contract detail with extracted fields
+      security: [{ session: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ContractDetailResponse' }
+        '401': { description: Unauthenticated }
+        '404': { description: Not found }
+  /contracts/{id}/document:
+    get:
+      operationId: getContractDocumentUrl
+      tags: [contracts]
+      summary: Signed URL to download the latest contract document
+      security: [{ session: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SignedURLResponse' }
+        '401': { description: Unauthenticated }
+        '404': { description: Not found }
 components:
   securitySchemes:
     session:
@@ -191,4 +255,53 @@ components:
       properties:
         contracts:
           type: array
-          items: { type: object }
+          items: { $ref: '#/components/schemas/ContractRow' }
+    ContractRow:
+      type: object
+      required: [id, title, status, created_at, updated_at]
+      properties:
+        id:         { type: string, format: uuid }
+        title:      { type: string }
+        status:     { type: string, enum: [intake, parsing, ready_for_review, approved, executed, rejected] }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    CreateContractResponse:
+      type: object
+      required: [id, status, contract_type, created_at]
+      properties:
+        id:            { type: string, format: uuid }
+        status:        { type: string }
+        contract_type: { type: string }
+        created_at:    { type: string, format: date-time }
+    ExtractedFieldRow:
+      type: object
+      required: [field_name, value, page_or_paragraph, span_start, span_end, model_id, prompt_version, extracted_at]
+      properties:
+        field_name:        { type: string }
+        value:             { type: string }
+        value_json:        { type: string }
+        page_or_paragraph: { type: string }
+        span_start:        { type: integer }
+        span_end:          { type: integer }
+        model_id:          { type: string }
+        prompt_version:    { type: string }
+        extracted_at:      { type: string, format: date-time }
+    ContractDetailResponse:
+      type: object
+      required: [id, title, status, contract_type, created_at, updated_at, extracted_fields]
+      properties:
+        id:               { type: string, format: uuid }
+        title:            { type: string }
+        status:           { type: string }
+        contract_type:    { type: string }
+        created_at:       { type: string, format: date-time }
+        updated_at:       { type: string, format: date-time }
+        extracted_fields:
+          type: array
+          items: { $ref: '#/components/schemas/ExtractedFieldRow' }
+    SignedURLResponse:
+      type: object
+      required: [url, expires_in_seconds]
+      properties:
+        url:                { type: string, format: uri }
+        expires_in_seconds: { type: integer }

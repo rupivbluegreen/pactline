@@ -49,6 +49,9 @@ func Router(d Deps) http.Handler {
 			}
 			if d.Contracts != nil {
 				r.Get("/contracts", d.Contracts.List)
+				r.Post("/contracts", d.Contracts.Create)
+				r.Get("/contracts/{id}", d.Contracts.Get)
+				r.Get("/contracts/{id}/document", d.Contracts.DocumentURL)
 			}
 		})
 	}
