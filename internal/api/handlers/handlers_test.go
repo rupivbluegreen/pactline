@@ -12,7 +12,7 @@ import (
 func TestHealthz(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/healthz", nil)
 	rec := httptest.NewRecorder()
-	api.Router().ServeHTTP(rec, req)
+	api.Router(api.Deps{}).ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status: got %d, want %d", rec.Code, http.StatusOK)
@@ -29,7 +29,7 @@ func TestHealthz(t *testing.T) {
 func TestHelloDefault(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/hello", nil)
 	rec := httptest.NewRecorder()
-	api.Router().ServeHTTP(rec, req)
+	api.Router(api.Deps{}).ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status: got %d, want %d", rec.Code, http.StatusOK)
@@ -46,7 +46,7 @@ func TestHelloDefault(t *testing.T) {
 func TestHelloNamed(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/hello?name=pactline", nil)
 	rec := httptest.NewRecorder()
-	api.Router().ServeHTTP(rec, req)
+	api.Router(api.Deps{}).ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status: got %d, want %d", rec.Code, http.StatusOK)

@@ -16,7 +16,7 @@ func TestSessionRepo_CreateAndGet(t *testing.T) {
 	sRepo := database.NewSessionRepo(&database.Pool{Pool: pool})
 	ctx := context.Background()
 
-	u, _, err := uRepo.CreateOrGetByEmail(ctx, "s-"+t.Name()+"@test.example.com")
+	u, _, err := uRepo.CreateOrGetByEmail(ctx, uniqueEmail("s-"+t.Name()))
 	if err != nil {
 		t.Fatalf("user: %v", err)
 	}
@@ -50,7 +50,7 @@ func TestSessionRepo_Expired(t *testing.T) {
 	uRepo := database.NewUserRepo(&database.Pool{Pool: pool})
 	sRepo := database.NewSessionRepo(&database.Pool{Pool: pool})
 	ctx := context.Background()
-	u, _, err := uRepo.CreateOrGetByEmail(ctx, "se-"+t.Name()+"@test.example.com")
+	u, _, err := uRepo.CreateOrGetByEmail(ctx, uniqueEmail("se-"+t.Name()))
 	if err != nil {
 		t.Fatalf("user: %v", err)
 	}
@@ -67,7 +67,7 @@ func TestMagicLinkRepo_ConsumeOnce(t *testing.T) {
 	pool := testdb(t)
 	mRepo := database.NewMagicLinkRepo(&database.Pool{Pool: pool})
 	ctx := context.Background()
-	email := "ml-" + t.Name() + "@test.example.com"
+	email := uniqueEmail("ml-" + t.Name())
 
 	tok, err := mRepo.Create(ctx, email, 15*time.Minute)
 	if err != nil {
@@ -92,7 +92,7 @@ func TestMagicLinkRepo_Expired(t *testing.T) {
 	mRepo := database.NewMagicLinkRepo(&database.Pool{Pool: pool})
 	ctx := context.Background()
 
-	tok, err := mRepo.Create(ctx, "exp-"+t.Name()+"@test.example.com", -time.Second)
+	tok, err := mRepo.Create(ctx, uniqueEmail("exp-"+t.Name()), -time.Second)
 	if err != nil {
 		t.Fatalf("create: %v", err)
 	}
@@ -109,3 +109,4 @@ func TestMagicLinkRepo_InvalidToken(t *testing.T) {
 		t.Errorf("expected ErrInvalidToken, got %v", err)
 	}
 }
+

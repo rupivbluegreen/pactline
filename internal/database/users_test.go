@@ -4,14 +4,20 @@ import (
 	"context"
 	"testing"
 
+	"github.com/google/uuid"
+
 	"github.com/rupivbluegreen/pactline/internal/database"
 )
+
+func uniqueEmail(prefix string) string {
+	return prefix + "-" + uuid.NewString()[:8] + "@test.example.com"
+}
 
 func TestUserRepo_CreateOrGet(t *testing.T) {
 	pool := testdb(t)
 	repo := database.NewUserRepo(&database.Pool{Pool: pool})
 	ctx := context.Background()
-	email := "u-" + t.Name() + "@test.example.com"
+	email := uniqueEmail("u-" + t.Name())
 
 	u1, created1, err := repo.CreateOrGetByEmail(ctx, email)
 	if err != nil {
@@ -37,7 +43,7 @@ func TestUserRepo_UpdateLastLogin(t *testing.T) {
 	pool := testdb(t)
 	repo := database.NewUserRepo(&database.Pool{Pool: pool})
 	ctx := context.Background()
-	u, _, err := repo.CreateOrGetByEmail(ctx, "ul-"+t.Name()+"@test.example.com")
+	u, _, err := repo.CreateOrGetByEmail(ctx, uniqueEmail("ul-"+t.Name()))
 	if err != nil {
 		t.Fatalf("create: %v", err)
 	}

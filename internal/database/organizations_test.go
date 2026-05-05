@@ -5,6 +5,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/google/uuid"
+
 	"github.com/rupivbluegreen/pactline/internal/core"
 	"github.com/rupivbluegreen/pactline/internal/database"
 )
@@ -30,7 +32,7 @@ func TestOrgRepo_CreateAndConflict(t *testing.T) {
 	repo := database.NewOrganizationRepo(&database.Pool{Pool: pool})
 	ctx := context.Background()
 
-	o1, err := repo.Create(ctx, "Acme "+t.Name(), "")
+	o1, err := repo.Create(ctx, "Acme "+t.Name()+" "+uuid.NewString()[:8], "")
 	if err != nil {
 		t.Fatalf("create 1: %v", err)
 	}
@@ -50,11 +52,11 @@ func TestMembershipRepo_Create_ListForUser(t *testing.T) {
 	mRepo := database.NewMembershipRepo(&database.Pool{Pool: pool})
 	ctx := context.Background()
 
-	u, _, err := uRepo.CreateOrGetByEmail(ctx, "m-"+t.Name()+"@test.example.com")
+	u, _, err := uRepo.CreateOrGetByEmail(ctx, "m-"+uuid.NewString()[:8]+"@test.example.com")
 	if err != nil {
 		t.Fatalf("user: %v", err)
 	}
-	o, err := oRepo.Create(ctx, "Acme "+t.Name(), "")
+	o, err := oRepo.Create(ctx, "Acme "+t.Name()+" "+uuid.NewString()[:8], "")
 	if err != nil {
 		t.Fatalf("org: %v", err)
 	}

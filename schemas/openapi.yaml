@@ -14,47 +14,181 @@ paths:
   /healthz:
     get:
       operationId: healthz
-      summary: Liveness probe
       tags: [health]
+      summary: Liveness probe
       responses:
         '200':
           description: OK
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/HealthResponse'
+              schema: { $ref: '#/components/schemas/HealthResponse' }
   /hello:
     get:
       operationId: hello
-      summary: Hello-world demonstrating the API → frontend type pipeline
       tags: [meta]
+      summary: Hello-world demonstrating the API → frontend type pipeline
       parameters:
         - in: query
           name: name
           required: false
-          schema:
-            type: string
-            default: world
+          schema: { type: string, default: world }
       responses:
         '200':
           description: OK
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/HelloResponse'
+              schema: { $ref: '#/components/schemas/HelloResponse' }
+  /auth/magic-link/request:
+    post:
+      operationId: requestMagicLink
+      tags: [auth]
+      summary: Request a magic-link sign-in email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        '202': { description: Email queued }
+        '400': { description: Bad request }
+  /auth/magic-link/verify:
+    post:
+      operationId: verifyMagicLink
+      tags: [auth]
+      summary: Exchange a magic-link token for a session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token: { type: string }
+      responses:
+        '200':
+          description: OK + Set-Cookie pactline_session
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VerifyResponse' }
+        '400': { description: Bad request (invalid / expired / consumed token) }
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Revoke the current session and clear the cookie
+      responses:
+        '204': { description: Logged out }
+  /me:
+    get:
+      operationId: me
+      tags: [auth]
+      summary: Current user profile + memberships
+      security: [{ session: [] }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MeResponse' }
+        '401': { description: Unauthenticated }
+  /organizations:
+    post:
+      operationId: createOrganization
+      tags: [organizations]
+      summary: Create an organization with the requester as owner
+      security: [{ session: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+                slug: { type: string }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrgResponse' }
+        '401': { description: Unauthenticated }
+        '409': { description: Slug taken }
+  /contracts:
+    get:
+      operationId: listContracts
+      tags: [contracts]
+      summary: List contracts for the current organization
+      security: [{ session: [] }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ContractsResponse' }
+        '400': { description: No organization context }
+        '401': { description: Unauthenticated }
 components:
+  securitySchemes:
+    session:
+      type: apiKey
+      in: cookie
+      name: pactline_session
   schemas:
     HealthResponse:
       type: object
       required: [status]
       properties:
-        status:
-          type: string
-          example: ok
+        status: { type: string, example: ok }
     HelloResponse:
       type: object
       required: [message]
       properties:
-        message:
-          type: string
-          example: hello, world
+        message: { type: string, example: hello, world }
+    VerifyResponse:
+      type: object
+      required: [session_token, expires_at, user_id, user_email]
+      properties:
+        session_token: { type: string }
+        expires_at: { type: string, format: date-time }
+        user_id: { type: string, format: uuid }
+        user_email: { type: string, format: email }
+    MeResponse:
+      type: object
+      required: [user_id, user_email, memberships]
+      properties:
+        user_id: { type: string, format: uuid }
+        user_email: { type: string, format: email }
+        current_organization_id: { type: string, format: uuid }
+        current_organization_name: { type: string }
+        memberships:
+          type: array
+          items: { $ref: '#/components/schemas/MembershipRow' }
+    MembershipRow:
+      type: object
+      required: [organization_id, organization_slug, organization_name, role]
+      properties:
+        organization_id: { type: string, format: uuid }
+        organization_slug: { type: string }
+        organization_name: { type: string }
+        role: { type: string, enum: [owner, admin, reviewer, approver, viewer] }
+    OrgResponse:
+      type: object
+      required: [id, slug, name]
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string }
+        name: { type: string }
+    ContractsResponse:
+      type: object
+      required: [contracts]
+      properties:
+        contracts:
+          type: array
+          items: { type: object }
