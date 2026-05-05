@@ -23,12 +23,14 @@ Python sidecars (`apps/{ai,document}-sidecar`), Next.js 15 frontend
 | Story | Status | Tag |
 |---|---|---|
 | Story 1 — signup → organization → empty contracts list | ✓ shipped 2026-05-05 | `phase-1-story-1` |
-| Story 2 — contract intake → AI metadata extraction | planned | — |
+| Story 2 — contract intake → AI metadata extraction | ✓ shipped 2026-05-05 | `phase-1-story-2` |
 | Story 3 — playbook flags + approval routing | planned | — |
 | Story 4 — DocuSign integration + executed-document storage | planned | — |
 | Story 5 — repository view with metadata search | planned | — |
 
 Story 1 in detail: a new user signs in via magic link, creates an organization, and lands on an empty contracts list. Exercises the full multi-tenant chassis (auth, sessions, hash-chained audit, tenant-scoped queries) end-to-end.
+
+Story 2 in detail: an authenticated user uploads a PDF or DOCX, MinIO stores it, the document sidecar (PyMuPDF / python-docx) parses it, the AI sidecar (LiteLLM + Anthropic Claude Sonnet) extracts five Citation-bearing fields, and a Temporal workflow drives the contract from `intake` → `parsing` → `ready_for_review`. Lights up the rest of the polyglot stack: Go ↔ Python gRPC, MinIO storage, Temporal worker, hand-authored proto + buf codegen.
 
 The audit log is hash-chained — every state-changing action writes one immutable event whose hash binds to the prior event in the same chain (per organization, with a separate system chain for pre-org events). The chain is verifiable in SQL (`prev_hash` of row N matches `event_hash` of row N-1). Lifted from the substrate-pattern of the sister product [statebound](https://github.com/rupivbluegreen/statebound).
 
