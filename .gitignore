@@ -13,11 +13,8 @@ coverage.out
 go.work
 go.work.sum
 
-# Generated proto stubs (regenerate with `make generate-proto`)
-internal/ai/aigrpc/
-internal/document/documentgrpc/
-apps/ai-sidecar/src/ai_sidecar/proto/
-apps/document-sidecar/src/document_sidecar/proto/
+# Generated proto stubs are committed so the CI drift check works:
+# `make generate-proto` regenerates them; `make lint` fails if stale.
 
 # Python
 __pycache__/

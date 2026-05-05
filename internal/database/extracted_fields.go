@@ -76,4 +76,3 @@ func (r *ExtractedFieldRepo) ListForContract(ctx context.Context, orgID, contrac
 	}
 	return out, rows.Err()
 }
-

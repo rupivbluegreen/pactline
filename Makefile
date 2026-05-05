@@ -29,6 +29,9 @@ lint:
 	cd apps/ai-sidecar && uv run ruff check . && uv run ruff format --check .
 	cd apps/document-sidecar && uv run ruff check . && uv run ruff format --check .
 	cd apps/web && pnpm lint
+	@echo ">> proto drift check"
+	$(MAKE) generate-proto
+	git diff --exit-code -- internal/ai/aigrpc internal/document/documentgrpc apps/ai-sidecar/src/ai_sidecar/proto apps/document-sidecar/src/document_sidecar/proto || (echo "Proto stubs are stale — run 'make generate-proto' and commit." && exit 1)
 
 typecheck:
 	@command -v staticcheck >/dev/null && staticcheck ./... || echo "(skipping staticcheck — not installed)"
@@ -52,8 +55,26 @@ generate-types:
 	@echo "Generated apps/web/src/api/types.ts"
 
 generate-proto:
-	@echo "Proto generation lands in Phase 1 once the buf/protoc toolchain is wired in."
-	@echo "Phase 0 ships proto schemas only; sidecars are idle stubs."
+	@echo ">> Go stubs (buf)"
+	buf generate
+	@echo ">> Python stubs (grpcio-tools, ai-sidecar)"
+	cd apps/ai-sidecar && uv run python -m grpc_tools.protoc \
+		-I../../proto \
+		--python_out=src/ai_sidecar/proto \
+		--grpc_python_out=src/ai_sidecar/proto \
+		--pyi_out=src/ai_sidecar/proto \
+		../../proto/ai.proto ../../proto/document.proto
+	@echo ">> Python stubs (grpcio-tools, document-sidecar)"
+	cd apps/document-sidecar && uv run python -m grpc_tools.protoc \
+		-I../../proto \
+		--python_out=src/document_sidecar/proto \
+		--grpc_python_out=src/document_sidecar/proto \
+		--pyi_out=src/document_sidecar/proto \
+		../../proto/document.proto
+	@echo ">> Patch generated python imports to be package-relative"
+	sed -i 's|^import ai_pb2 |from . import ai_pb2 |' apps/ai-sidecar/src/ai_sidecar/proto/ai_pb2_grpc.py
+	sed -i 's|^import document_pb2 |from . import document_pb2 |' apps/ai-sidecar/src/ai_sidecar/proto/document_pb2_grpc.py 2>/dev/null || true
+	sed -i 's|^import document_pb2 |from . import document_pb2 |' apps/document-sidecar/src/document_sidecar/proto/document_pb2_grpc.py
 
 migrate:
 	@echo "Migrations land in Phase 1; goose dir is /migrations."
