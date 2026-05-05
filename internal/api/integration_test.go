@@ -57,10 +57,16 @@ func TestTenantIsolation_TwoUsersTwoOrgs(t *testing.T) {
 
 	router := api.Router(api.Deps{
 		Sessions: sess, Memberships: mems,
-		Auth:      &handlers.AuthHandlers{Svc: authSvc},
-		Me:        &handlers.MeHandler{Users: users, Memberships: mems, Orgs: orgs},
-		Orgs:      &handlers.OrgsHandlers{Svc: orgSvc},
-		Contracts: &handlers.ContractsHandler{},
+		Auth: &handlers.AuthHandlers{Svc: authSvc},
+		Me:   &handlers.MeHandler{Users: users, Memberships: mems, Orgs: orgs},
+		Orgs: &handlers.OrgsHandlers{Svc: orgSvc},
+		Contracts: &handlers.ContractsHandler{
+			Pool:              pool,
+			Contracts:         database.NewContractRepo(pool),
+			ContractTypes:     database.NewContractTypeRepo(pool),
+			ContractDocuments: database.NewContractDocumentRepo(pool),
+			ExtractedFields:   database.NewExtractedFieldRepo(pool),
+		},
 	})
 
 	suffix1 := uuid.NewString()[:8]

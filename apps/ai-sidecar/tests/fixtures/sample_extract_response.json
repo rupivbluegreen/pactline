@@ -1,0 +1,74 @@
+{
+  "fields": [
+    {
+      "field_name": "parties",
+      "value": "Acme Corp and Beta LLC",
+      "value_json": "[\"Acme Corp\",\"Beta LLC\"]",
+      "citation": {
+        "document_id": "DOC",
+        "locator": "page:1",
+        "span_start": 0,
+        "span_end": 38,
+        "model_id": "anthropic/claude-3-5-sonnet",
+        "prompt_version": "v1",
+        "timestamp": "2026-05-05T12:00:00Z"
+      }
+    },
+    {
+      "field_name": "effective_date",
+      "value": "2026-05-01",
+      "value_json": "",
+      "citation": {
+        "document_id": "DOC",
+        "locator": "page:1",
+        "span_start": 39,
+        "span_end": 70,
+        "model_id": "anthropic/claude-3-5-sonnet",
+        "prompt_version": "v1",
+        "timestamp": "2026-05-05T12:00:00Z"
+      }
+    },
+    {
+      "field_name": "term",
+      "value": "two (2) years",
+      "value_json": "",
+      "citation": {
+        "document_id": "DOC",
+        "locator": "page:1",
+        "span_start": 71,
+        "span_end": 95,
+        "model_id": "anthropic/claude-3-5-sonnet",
+        "prompt_version": "v1",
+        "timestamp": "2026-05-05T12:00:00Z"
+      }
+    },
+    {
+      "field_name": "value",
+      "value": "n/a",
+      "value_json": "",
+      "citation": {
+        "document_id": "DOC",
+        "locator": "page:1",
+        "span_start": 96,
+        "span_end": 99,
+        "model_id": "anthropic/claude-3-5-sonnet",
+        "prompt_version": "v1",
+        "timestamp": "2026-05-05T12:00:00Z"
+      }
+    },
+    {
+      "field_name": "governing_law",
+      "value": "State of Delaware",
+      "value_json": "",
+      "citation": {
+        "document_id": "DOC",
+        "locator": "page:2",
+        "span_start": 0,
+        "span_end": 33,
+        "model_id": "anthropic/claude-3-5-sonnet",
+        "prompt_version": "v1",
+        "timestamp": "2026-05-05T12:00:00Z"
+      }
+    }
+  ]
+}

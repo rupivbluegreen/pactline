@@ -4,15 +4,28 @@ package pactline.document.v1;
 
 option go_package = "github.com/rupivbluegreen/pactline/internal/document/documentgrpc;documentgrpc";
 
-// Document sidecar service. Phase 0: Health only.
-// Phase 1: Parse(binary) -> text + layout; RenderDOCX(template, vars) ->
-// rendered DOCX bytes; ConvertDOCXToPDF; etc.
 service Document {
   rpc Health(HealthRequest) returns (HealthResponse);
+  rpc Parse(ParseRequest) returns (ParseResponse);
 }
 
 message HealthRequest {}
+message HealthResponse { string status = 1; }
 
-message HealthResponse {
-  string status = 1;
+message ParseRequest {
+  string document_id = 1;
+  bytes content = 2;
+  string mime_type = 3;
+}
+
+message ParseResponse {
+  string text = 1;
+  int32 page_count = 2;
+  repeated TextSegment segments = 3;
+}
+
+message TextSegment {
+  string locator = 1;
+  int32 char_start = 2;
+  int32 char_end = 3;
 }

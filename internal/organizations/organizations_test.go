@@ -75,6 +75,31 @@ func TestCreateForUser(t *testing.T) {
 	}
 }
 
+func TestCreateForUser_SeedsNDAType(t *testing.T) {
+	p := mustPool(t)
+	ctx := context.Background()
+	users := database.NewUserRepo(p)
+	svc := organizations.NewService(p)
+
+	u, _, err := users.CreateOrGetByEmail(ctx, "seednda-"+uuid.NewString()[:8]+"@example.com")
+	if err != nil {
+		t.Fatalf("user: %v", err)
+	}
+	o, err := svc.CreateForUser(ctx, u.ID, "Seed NDA "+uuid.NewString()[:6], "")
+	if err != nil {
+		t.Fatalf("create: %v", err)
+	}
+
+	repo := database.NewContractTypeRepo(p)
+	ct, err := repo.GetBySlug(ctx, o.ID, core.ContractTypeSlugNDA)
+	if err != nil {
+		t.Fatalf("expected NDA seeded, got: %v", err)
+	}
+	if ct.Name != "NDA" {
+		t.Errorf("name: %q", ct.Name)
+	}
+}
+
 func TestCreateForUser_SlugConflict(t *testing.T) {
 	p := mustPool(t)
 	ctx := context.Background()

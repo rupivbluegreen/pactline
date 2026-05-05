@@ -24,6 +24,15 @@ const (
 	ActionSessionRevoked      Action = "session.revoked"
 	ActionOrganizationCreated Action = "organization.created"
 	ActionMembershipCreated   Action = "membership.created"
+
+	ActionContractTypeCreated         Action = "contract_type.created"
+	ActionContractCreated             Action = "contract.created"
+	ActionContractDocumentUploaded    Action = "contract.document_uploaded"
+	ActionContractParseStarted        Action = "contract.parse_started"
+	ActionContractParseCompleted      Action = "contract.parse_completed"
+	ActionContractExtractionStarted   Action = "contract.extraction_started"
+	ActionContractExtractionCompleted Action = "contract.extraction_completed"
+	ActionContractTransitioned        Action = "contract.transitioned"
 )
 
 // Event is one row in audit_events. prev_hash and event_hash are computed

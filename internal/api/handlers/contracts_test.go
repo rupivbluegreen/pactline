@@ -21,16 +21,23 @@ func TestContractsList_NoOrg(t *testing.T) {
 	}
 }
 
-func TestContractsList_Empty(t *testing.T) {
+func TestContractsCreate_NoOrg(t *testing.T) {
+	h := &handlers.ContractsHandler{}
+	req := httptest.NewRequest(http.MethodPost, "/contracts", nil)
+	rec := httptest.NewRecorder()
+	h.Create(rec, req)
+	if rec.Code != http.StatusBadRequest {
+		t.Errorf("expected 400, got %d", rec.Code)
+	}
+}
+
+func TestContractsCreate_NoUser(t *testing.T) {
 	h := &handlers.ContractsHandler{}
 	ctx := database.WithOrgID(context.Background(), uuid.New())
+	req := httptest.NewRequest(http.MethodPost, "/contracts", nil).WithContext(ctx)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/contracts", nil).WithContext(ctx)
-	h.List(rec, req)
-	if rec.Code != http.StatusOK {
-		t.Errorf("expected 200, got %d", rec.Code)
-	}
-	if rec.Body.String() == "" {
-		t.Error("empty body")
+	h.Create(rec, req)
+	if rec.Code != http.StatusUnauthorized {
+		t.Errorf("expected 401, got %d", rec.Code)
 	}
 }

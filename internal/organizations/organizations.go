@@ -15,15 +15,16 @@ import (
 )
 
 type Service struct {
-	pool *database.Pool
+	pool         *database.Pool
+	contractType *database.ContractTypeRepo
 }
 
 func NewService(pool *database.Pool) *Service {
-	return &Service{pool: pool}
+	return &Service{pool: pool, contractType: database.NewContractTypeRepo(pool)}
 }
 
-// CreateForUser creates the org, adds the user as owner, and writes audit
-// events. All rows are committed in one transaction.
+// CreateForUser creates the org, adds the user as owner, seeds the NDA
+// contract type, and writes audit events. All rows are committed in one tx.
 func (s *Service) CreateForUser(ctx context.Context, userID uuid.UUID, name, slug string) (*core.Organization, error) {
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
@@ -56,6 +57,11 @@ func (s *Service) CreateForUser(ctx context.Context, userID uuid.UUID, name, slu
 		return nil, fmt.Errorf("insert membership: %w", err)
 	}
 
+	ct, err := s.contractType.CreateTx(ctx, tx, o.ID, core.ContractTypeSlugNDA, "NDA")
+	if err != nil {
+		return nil, fmt.Errorf("seed contract type: %w", err)
+	}
+
 	if err := audit.Write(ctx, tx, audit.Event{
 		OrganizationID: &o.ID, ActorUserID: &userID,
 		Action: audit.ActionOrganizationCreated, EntityType: "organization",
@@ -67,6 +73,13 @@ func (s *Service) CreateForUser(ctx context.Context, userID uuid.UUID, name, slu
 		OrganizationID: &o.ID, ActorUserID: &userID,
 		Action: audit.ActionMembershipCreated, EntityType: "membership",
 		EntityID: &memID, After: map[string]string{"role": "owner"},
+	}); err != nil {
+		return nil, err
+	}
+	if err := audit.Write(ctx, tx, audit.Event{
+		OrganizationID: &o.ID, ActorUserID: &userID,
+		Action: audit.ActionContractTypeCreated, EntityType: "contract_type",
+		EntityID: &ct.ID, After: map[string]string{"slug": ct.Slug, "name": ct.Name},
 	}); err != nil {
 		return nil, err
 	}
