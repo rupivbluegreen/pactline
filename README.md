@@ -16,7 +16,7 @@ Open-source contract lifecycle platform built on durable workflows.
 | 0 — Foundation | ✓ shipped 2026-05-05 | `phase-0` |
 | 1 — v1 MVP (pre-sign pipeline + AI extraction) | in progress | — |
 |     ↳ Story 1: signup → organization → empty contracts | ✓ shipped 2026-05-05 | `phase-1-story-1` |
-|     ↳ Story 2: contract intake + AI extraction | planned | — |
+|     ↳ Story 2: contract intake + AI extraction | ✓ shipped 2026-05-05 | `phase-1-story-2` |
 |     ↳ Story 3: playbook flags + approval routing | planned | — |
 |     ↳ Story 4: DocuSign integration | planned | — |
 |     ↳ Story 5: repository view + search | planned | — |
