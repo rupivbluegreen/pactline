@@ -10,18 +10,20 @@ import (
 )
 
 func MigrateUp(ctx context.Context, pool *Pool) error {
-	cfg := pool.Pool.Config().ConnConfig
-	db := stdlib.OpenDB(*cfg)
+	db := stdlib.OpenDBFromPool(pool.Pool)
 	defer db.Close()
 
-	goose.SetBaseFS(migrationsFS)
-	if err := goose.SetDialect("postgres"); err != nil {
-		return fmt.Errorf("goose dialect: %w", err)
-	}
-	if err := goose.UpContext(ctx, db, "migrations"); err != nil {
-		if errors.Is(err, goose.ErrNoMigrationFiles) {
+	provider, err := goose.NewProvider(goose.DialectPostgres, db, migrationsFS)
+	if err != nil {
+		// ErrNoMigrations is returned when the embedded directory contains no
+		// .sql files; normal during Phase 0 before Task 3 adds the first
+		// migration.
+		if errors.Is(err, goose.ErrNoMigrations) {
 			return nil
 		}
+		return fmt.Errorf("goose provider: %w", err)
+	}
+	if _, err := provider.Up(ctx); err != nil {
 		return fmt.Errorf("goose up: %w", err)
 	}
 	return nil
