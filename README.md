@@ -47,7 +47,7 @@ Then visit:
 | ai-sidecar (gRPC) | 50051 |
 | document-sidecar (gRPC) | 50052 |
 | Temporal | 7233 (gRPC), 8233 (UI) |
-| Postgres | 5432 |
+| Postgres | 5433 (5432 inside the compose network) |
 | Redis | 6379 |
 | MinIO | 9000 (S3), 9001 (console) |
 | Mailpit | 1025 (SMTP), 8025 (UI) |

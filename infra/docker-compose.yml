@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: pactline
       POSTGRES_DB: pactline
     ports:
-      - "5432:5432"
+      - "${PACTLINE_PG_PORT:-5433}:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
