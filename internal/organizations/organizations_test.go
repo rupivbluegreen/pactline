@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/rupivbluegreen/pactline/internal/core"
 	"github.com/rupivbluegreen/pactline/internal/database"
 	"github.com/rupivbluegreen/pactline/internal/organizations"
@@ -53,7 +55,7 @@ func TestCreateForUser(t *testing.T) {
 	if err != nil {
 		t.Fatalf("user: %v", err)
 	}
-	o, err := svc.CreateForUser(ctx, u.ID, "Acme "+t.Name(), "")
+	o, err := svc.CreateForUser(ctx, u.ID, "Acme "+t.Name()+" "+uuid.NewString()[:8], "")
 	if err != nil {
 		t.Fatalf("create: %v", err)
 	}
@@ -83,7 +85,7 @@ func TestCreateForUser_SlugConflict(t *testing.T) {
 	if err != nil {
 		t.Fatalf("user: %v", err)
 	}
-	first, err := svc.CreateForUser(ctx, u.ID, "Acme "+t.Name(), "")
+	first, err := svc.CreateForUser(ctx, u.ID, "Acme "+t.Name()+" "+uuid.NewString()[:8], "")
 	if err != nil {
 		t.Fatalf("create 1: %v", err)
 	}
