@@ -65,7 +65,6 @@ func insertUser(t *testing.T, pool *pgxpool.Pool, id uuid.UUID, email string) {
 func TestWrite_AppendsToChain(t *testing.T) {
 	pool := mustPool(t)
 	ctx := context.Background()
-	_ = time.Now // suppress import lint
 
 	org := uuid.New()
 	user := uuid.New()
