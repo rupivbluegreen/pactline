@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x64ocument.proto\x12\x14pactline.document.v1\"\x0f\n\rHealthRequest\" \n\x0eHealthResponse\x12\x0e\n\x06status\x18\x01 \x01(\t2_\n\x08\x44ocument\x12S\n\x06Health\x12#.pactline.document.v1.HealthRequest\x1a$.pactline.document.v1.HealthResponseBPZNgithub.com/rupivbluegreen/pactline/internal/document/documentgrpc;documentgrpcb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x64ocument.proto\x12\x14pactline.document.v1\"\x0f\n\rHealthRequest\" \n\x0eHealthResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\"G\n\x0cParseRequest\x12\x13\n\x0b\x64ocument_id\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\x0c\x12\x11\n\tmime_type\x18\x03 \x01(\t\"f\n\rParseResponse\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x12\n\npage_count\x18\x02 \x01(\x05\x12\x33\n\x08segments\x18\x03 \x03(\x0b\x32!.pactline.document.v1.TextSegment\"D\n\x0bTextSegment\x12\x0f\n\x07locator\x18\x01 \x01(\t\x12\x12\n\nchar_start\x18\x02 \x01(\x05\x12\x10\n\x08\x63har_end\x18\x03 \x01(\x05\x32\xb1\x01\n\x08\x44ocument\x12S\n\x06Health\x12#.pactline.document.v1.HealthRequest\x1a$.pactline.document.v1.HealthResponse\x12P\n\x05Parse\x12\".pactline.document.v1.ParseRequest\x1a#.pactline.document.v1.ParseResponseBPZNgithub.com/rupivbluegreen/pactline/internal/document/documentgrpc;documentgrpcb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -36,6 +36,12 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_HEALTHREQUEST']._serialized_end=55
   _globals['_HEALTHRESPONSE']._serialized_start=57
   _globals['_HEALTHRESPONSE']._serialized_end=89
-  _globals['_DOCUMENT']._serialized_start=91
-  _globals['_DOCUMENT']._serialized_end=186
+  _globals['_PARSEREQUEST']._serialized_start=91
+  _globals['_PARSEREQUEST']._serialized_end=162
+  _globals['_PARSERESPONSE']._serialized_start=164
+  _globals['_PARSERESPONSE']._serialized_end=266
+  _globals['_TEXTSEGMENT']._serialized_start=268
+  _globals['_TEXTSEGMENT']._serialized_end=336
+  _globals['_DOCUMENT']._serialized_start=339
+  _globals['_DOCUMENT']._serialized_end=516
 # @@protoc_insertion_point(module_scope)

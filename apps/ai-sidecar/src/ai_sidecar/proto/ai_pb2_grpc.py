@@ -26,10 +26,7 @@ if _version_not_supported:
 
 
 class AIStub(object):
-    """AI sidecar service. Phase 0: Health only.
-    Phase 1: ExtractFields(document) -> Citation-bearing structured output;
-    EvaluatePlaybook(rules, document) -> flag set; etc.
-    """
+    """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
         """Constructor.
@@ -42,15 +39,23 @@ class AIStub(object):
                 request_serializer=ai__pb2.HealthRequest.SerializeToString,
                 response_deserializer=ai__pb2.HealthResponse.FromString,
                 _registered_method=True)
+        self.ExtractFields = channel.unary_unary(
+                '/pactline.ai.v1.AI/ExtractFields',
+                request_serializer=ai__pb2.ExtractRequest.SerializeToString,
+                response_deserializer=ai__pb2.ExtractResponse.FromString,
+                _registered_method=True)
 
 
 class AIServicer(object):
-    """AI sidecar service. Phase 0: Health only.
-    Phase 1: ExtractFields(document) -> Citation-bearing structured output;
-    EvaluatePlaybook(rules, document) -> flag set; etc.
-    """
+    """Missing associated documentation comment in .proto file."""
 
     def Health(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ExtractFields(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -64,6 +69,11 @@ def add_AIServicer_to_server(servicer, server):
                     request_deserializer=ai__pb2.HealthRequest.FromString,
                     response_serializer=ai__pb2.HealthResponse.SerializeToString,
             ),
+            'ExtractFields': grpc.unary_unary_rpc_method_handler(
+                    servicer.ExtractFields,
+                    request_deserializer=ai__pb2.ExtractRequest.FromString,
+                    response_serializer=ai__pb2.ExtractResponse.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
             'pactline.ai.v1.AI', rpc_method_handlers)
@@ -73,10 +83,7 @@ def add_AIServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class AI(object):
-    """AI sidecar service. Phase 0: Health only.
-    Phase 1: ExtractFields(document) -> Citation-bearing structured output;
-    EvaluatePlaybook(rules, document) -> flag set; etc.
-    """
+    """Missing associated documentation comment in .proto file."""
 
     @staticmethod
     def Health(request,
@@ -95,6 +102,33 @@ class AI(object):
             '/pactline.ai.v1.AI/Health',
             ai__pb2.HealthRequest.SerializeToString,
             ai__pb2.HealthResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ExtractFields(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/pactline.ai.v1.AI/ExtractFields',
+            ai__pb2.ExtractRequest.SerializeToString,
+            ai__pb2.ExtractResponse.FromString,
             options,
             channel_credentials,
             insecure,

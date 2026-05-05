@@ -19,18 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AI_Health_FullMethodName = "/pactline.ai.v1.AI/Health"
+	AI_Health_FullMethodName        = "/pactline.ai.v1.AI/Health"
+	AI_ExtractFields_FullMethodName = "/pactline.ai.v1.AI/ExtractFields"
 )
 
 // AIClient is the client API for AI service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// AI sidecar service. Phase 0: Health only.
-// Phase 1: ExtractFields(document) -> Citation-bearing structured output;
-// EvaluatePlaybook(rules, document) -> flag set; etc.
 type AIClient interface {
 	Health(ctx context.Context, in *HealthRequest, opts ...grpc.CallOption) (*HealthResponse, error)
+	ExtractFields(ctx context.Context, in *ExtractRequest, opts ...grpc.CallOption) (*ExtractResponse, error)
 }
 
 type aIClient struct {
@@ -51,15 +49,22 @@ func (c *aIClient) Health(ctx context.Context, in *HealthRequest, opts ...grpc.C
 	return out, nil
 }
 
+func (c *aIClient) ExtractFields(ctx context.Context, in *ExtractRequest, opts ...grpc.CallOption) (*ExtractResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ExtractResponse)
+	err := c.cc.Invoke(ctx, AI_ExtractFields_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AIServer is the server API for AI service.
 // All implementations must embed UnimplementedAIServer
 // for forward compatibility.
-//
-// AI sidecar service. Phase 0: Health only.
-// Phase 1: ExtractFields(document) -> Citation-bearing structured output;
-// EvaluatePlaybook(rules, document) -> flag set; etc.
 type AIServer interface {
 	Health(context.Context, *HealthRequest) (*HealthResponse, error)
+	ExtractFields(context.Context, *ExtractRequest) (*ExtractResponse, error)
 	mustEmbedUnimplementedAIServer()
 }
 
@@ -72,6 +77,9 @@ type UnimplementedAIServer struct{}
 
 func (UnimplementedAIServer) Health(context.Context, *HealthRequest) (*HealthResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Health not implemented")
+}
+func (UnimplementedAIServer) ExtractFields(context.Context, *ExtractRequest) (*ExtractResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ExtractFields not implemented")
 }
 func (UnimplementedAIServer) mustEmbedUnimplementedAIServer() {}
 func (UnimplementedAIServer) testEmbeddedByValue()            {}
@@ -112,6 +120,24 @@ func _AI_Health_Handler(srv interface{}, ctx context.Context, dec func(interface
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AI_ExtractFields_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExtractRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AIServer).ExtractFields(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AI_ExtractFields_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AIServer).ExtractFields(ctx, req.(*ExtractRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AI_ServiceDesc is the grpc.ServiceDesc for AI service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -122,6 +148,10 @@ var AI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Health",
 			Handler:    _AI_Health_Handler,
+		},
+		{
+			MethodName: "ExtractFields",
+			Handler:    _AI_ExtractFields_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

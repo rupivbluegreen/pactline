@@ -26,10 +26,7 @@ if _version_not_supported:
 
 
 class DocumentStub(object):
-    """Document sidecar service. Phase 0: Health only.
-    Phase 1: Parse(binary) -> text + layout; RenderDOCX(template, vars) ->
-    rendered DOCX bytes; ConvertDOCXToPDF; etc.
-    """
+    """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
         """Constructor.
@@ -42,15 +39,23 @@ class DocumentStub(object):
                 request_serializer=document__pb2.HealthRequest.SerializeToString,
                 response_deserializer=document__pb2.HealthResponse.FromString,
                 _registered_method=True)
+        self.Parse = channel.unary_unary(
+                '/pactline.document.v1.Document/Parse',
+                request_serializer=document__pb2.ParseRequest.SerializeToString,
+                response_deserializer=document__pb2.ParseResponse.FromString,
+                _registered_method=True)
 
 
 class DocumentServicer(object):
-    """Document sidecar service. Phase 0: Health only.
-    Phase 1: Parse(binary) -> text + layout; RenderDOCX(template, vars) ->
-    rendered DOCX bytes; ConvertDOCXToPDF; etc.
-    """
+    """Missing associated documentation comment in .proto file."""
 
     def Health(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def Parse(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -64,6 +69,11 @@ def add_DocumentServicer_to_server(servicer, server):
                     request_deserializer=document__pb2.HealthRequest.FromString,
                     response_serializer=document__pb2.HealthResponse.SerializeToString,
             ),
+            'Parse': grpc.unary_unary_rpc_method_handler(
+                    servicer.Parse,
+                    request_deserializer=document__pb2.ParseRequest.FromString,
+                    response_serializer=document__pb2.ParseResponse.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
             'pactline.document.v1.Document', rpc_method_handlers)
@@ -73,10 +83,7 @@ def add_DocumentServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class Document(object):
-    """Document sidecar service. Phase 0: Health only.
-    Phase 1: Parse(binary) -> text + layout; RenderDOCX(template, vars) ->
-    rendered DOCX bytes; ConvertDOCXToPDF; etc.
-    """
+    """Missing associated documentation comment in .proto file."""
 
     @staticmethod
     def Health(request,
@@ -95,6 +102,33 @@ class Document(object):
             '/pactline.document.v1.Document/Health',
             document__pb2.HealthRequest.SerializeToString,
             document__pb2.HealthResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def Parse(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/pactline.document.v1.Document/Parse',
+            document__pb2.ParseRequest.SerializeToString,
+            document__pb2.ParseResponse.FromString,
             options,
             channel_credentials,
             insecure,

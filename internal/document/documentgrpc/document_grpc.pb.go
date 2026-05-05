@@ -20,17 +20,15 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	Document_Health_FullMethodName = "/pactline.document.v1.Document/Health"
+	Document_Parse_FullMethodName  = "/pactline.document.v1.Document/Parse"
 )
 
 // DocumentClient is the client API for Document service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// Document sidecar service. Phase 0: Health only.
-// Phase 1: Parse(binary) -> text + layout; RenderDOCX(template, vars) ->
-// rendered DOCX bytes; ConvertDOCXToPDF; etc.
 type DocumentClient interface {
 	Health(ctx context.Context, in *HealthRequest, opts ...grpc.CallOption) (*HealthResponse, error)
+	Parse(ctx context.Context, in *ParseRequest, opts ...grpc.CallOption) (*ParseResponse, error)
 }
 
 type documentClient struct {
@@ -51,15 +49,22 @@ func (c *documentClient) Health(ctx context.Context, in *HealthRequest, opts ...
 	return out, nil
 }
 
+func (c *documentClient) Parse(ctx context.Context, in *ParseRequest, opts ...grpc.CallOption) (*ParseResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ParseResponse)
+	err := c.cc.Invoke(ctx, Document_Parse_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DocumentServer is the server API for Document service.
 // All implementations must embed UnimplementedDocumentServer
 // for forward compatibility.
-//
-// Document sidecar service. Phase 0: Health only.
-// Phase 1: Parse(binary) -> text + layout; RenderDOCX(template, vars) ->
-// rendered DOCX bytes; ConvertDOCXToPDF; etc.
 type DocumentServer interface {
 	Health(context.Context, *HealthRequest) (*HealthResponse, error)
+	Parse(context.Context, *ParseRequest) (*ParseResponse, error)
 	mustEmbedUnimplementedDocumentServer()
 }
 
@@ -72,6 +77,9 @@ type UnimplementedDocumentServer struct{}
 
 func (UnimplementedDocumentServer) Health(context.Context, *HealthRequest) (*HealthResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Health not implemented")
+}
+func (UnimplementedDocumentServer) Parse(context.Context, *ParseRequest) (*ParseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Parse not implemented")
 }
 func (UnimplementedDocumentServer) mustEmbedUnimplementedDocumentServer() {}
 func (UnimplementedDocumentServer) testEmbeddedByValue()                  {}
@@ -112,6 +120,24 @@ func _Document_Health_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Document_Parse_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ParseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DocumentServer).Parse(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Document_Parse_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DocumentServer).Parse(ctx, req.(*ParseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Document_ServiceDesc is the grpc.ServiceDesc for Document service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -122,6 +148,10 @@ var Document_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Health",
 			Handler:    _Document_Health_Handler,
+		},
+		{
+			MethodName: "Parse",
+			Handler:    _Document_Parse_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

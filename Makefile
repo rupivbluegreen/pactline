@@ -73,6 +73,7 @@ generate-proto:
 		../../proto/document.proto
 	@echo ">> Patch generated python imports to be package-relative"
 	sed -i 's|^import ai_pb2 |from . import ai_pb2 |' apps/ai-sidecar/src/ai_sidecar/proto/ai_pb2_grpc.py
+	sed -i 's|^import document_pb2 |from . import document_pb2 |' apps/ai-sidecar/src/ai_sidecar/proto/ai_pb2.py
 	sed -i 's|^import document_pb2 |from . import document_pb2 |' apps/ai-sidecar/src/ai_sidecar/proto/document_pb2_grpc.py 2>/dev/null || true
 	sed -i 's|^import document_pb2 |from . import document_pb2 |' apps/document-sidecar/src/document_sidecar/proto/document_pb2_grpc.py
 
