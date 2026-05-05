@@ -27,6 +27,7 @@ packages = ["src/ai_sidecar"]
 [tool.ruff]
 line-length = 88
 target-version = "py312"
+extend-exclude = ["src/ai_sidecar/proto"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N", "ASYNC", "S", "RUF"]
@@ -34,6 +35,7 @@ select = ["E", "F", "I", "B", "UP", "N", "ASYNC", "S", "RUF"]
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S101"]
 "src/ai_sidecar/proto/**/*.py" = ["E", "F", "I", "B", "UP", "N", "ASYNC", "S", "RUF"]
+"src/ai_sidecar/proto/**/*.pyi" = ["E", "F", "I", "B", "UP", "N", "ASYNC", "S", "RUF"]
 
 [tool.pyright]
 include = ["src", "tests"]
